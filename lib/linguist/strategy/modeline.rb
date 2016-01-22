@@ -1,19 +1,8 @@
 module Linguist
   module Strategy
     class Modeline
-      EMACS_MODELINE = /-\*-\s*(?:(?!mode)[\w-]+\s*:\s*(?:[\w+-]+)\s*;?\s*)*(?:mode\s*:)?\s*([\w+-]+)\s*(?:;\s*(?!mode)[\w-]+\s*:\s*[\w+-]+\s*)*;?\s*-\*-/i
-
-      # First form vim modeline
-      # [text]{white}{vi:|vim:|ex:}[white]{options}
-      # ex: 'vim: syntax=perl'
-      VIM_MODELINE_1 = /(?:vim|vi|ex):\s*(?:ft|filetype|syntax)=(\w+)\s?/i
-
-      # Second form vim modeline (compatible with some versions of Vi)
-      # [text]{white}{vi:|vim:|Vim:|ex:}[white]se[t] {options}:[text]
-      # ex: 'vim set syntax=perl:'
-      VIM_MODELINE_2 = /(?:vim|vi|Vim|ex):\s*se(?:t)?.*\s(?:ft|filetype|syntax)=(\w+)\s?.*:/i
-
-      MODELINES = [EMACS_MODELINE, VIM_MODELINE_1, VIM_MODELINE_2]
+      EmacsModeline = /-\*-\s*(?:(?!mode)[\w-]+\s*:\s*(?:[\w+-]+)\s*;?\s*)*(?:mode\s*:)?\s*([\w+-]+)\s*(?:;\s*(?!mode)[\w-]+\s*:\s*[\w+-]+\s*)*;?\s*-\*-/i
+      VimModeline = /vim:\s*set.*\s(?:ft|filetype)=(\w+)\s?.*:/i
 
       # Public: Detects language based on Vim and Emacs modelines
       #
@@ -33,7 +22,7 @@ module Linguist
       #
       # Returns a String or nil
       def self.modeline(data)
-        match = MODELINES.map { |regex| data.match(regex) }.reject(&:nil?).first
+        match = data.match(EmacsModeline) || data.match(VimModeline)
         match[1] if match
       end
     end
